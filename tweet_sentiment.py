@@ -1,5 +1,6 @@
 import sys
 import json
+import string
 
 def create_dictionary(AFINN_file):
     scores = {} # initialize an empty dictionary
@@ -10,12 +11,8 @@ def create_dictionary(AFINN_file):
     return scores
 
 
-def hw():
-    print 'Hello, world!'
-
-
 def lines(tweet_file):
-#this def creates a list of english tweets with 0's in the places where the tweets are in a bad format
+#this def creates a list of english tweets with 0's in the places where the tweets recieved are either not in english or not there
     tweets = []
     for line in tweet_file:
         python_tweet_line = json.loads(line) #changing JSON intp python
@@ -23,22 +20,31 @@ def lines(tweet_file):
             tweets.append(python_tweet_line["text"])
         else:
             tweets.append('0')
-    print tweets
     return tweets
 
-#def match(tweets, scores):
-#this will go through AFINN file and check to see if any of the words are in the tweet
- #  print 'Kari'
+
+def match(tweets, scores):
+    i = 0
+    for tweet in tweets: 
+        for c in string.punctuation: # takes out punctuation
+            tweet = tweet.replace(c,"")
+        tweets[i] = tweet.lower() #makes tweets in all lowercase
+        words = tweets[i].split() #splits words at every white space
+        i = i+1
+        x = 0
+        for word in words:
+            if word in scores: #checks to see if word is in AFINN file
+                x = x + scores[word] #adds together words that have sentiment values
+        print x
 
 
 def main():
     AFINN_file = open(sys.argv[1])
     tweet_file = open(sys.argv[2])    
-    create_dictionary(AFINN_file)
-    hw()
-    lines(tweet_file)
-    #match(tweets, scores)
+    scores = create_dictionary(AFINN_file)
+    tweets = lines(tweet_file)
+    match(tweets, scores)
+
 
 if __name__ == '__main__':
     main()
-    #match(tweets, scores)
